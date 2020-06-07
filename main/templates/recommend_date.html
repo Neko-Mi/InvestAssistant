@@ -1,0 +1,25 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<h2>Рекомендуемые дни покупки акций, для получения дивидендов</h2>
+<h3>Ваши критерии:</h3>
+<ul>
+    <li><p>уровень денег: {{ money }}</p></li>
+    <li><p>уровень риска: {{ risk }}</p></li>
+</ul>
+<br>
+<h3>Акции подобранные по вашим критериям:</h3>
+{% if stock_list %}
+    <ul>
+    {% for stock in stock_list %}
+        {% if stock.price < money_val and risk_min < stock.mape and stock.mape < risk_val%}
+        <li><h4>{{ stock.name }}</h4>
+            <p>дата закрытия реестра: {{ stock.reg_day_future }}</p>
+            <p>дата покупки: {{ stock.rec_day_new }}</p>
+        </li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Подходящих акций нет</p>
+{% endif %}
+{% endblock %}

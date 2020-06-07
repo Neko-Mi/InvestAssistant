@@ -1,0 +1,33 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<h2>Рекомендуемые акции</h2>
+<h3>Ваши критерии:</h3>
+<ul>
+    <li><p>уровень денег: {{ money }}</p></li>
+    <li><p>уровень риска: {{ risk }}</p></li>
+    <li><p>сроки (месяцев): {{ time_invest }}</p></li>
+</ul>
+<br>
+<h3>Акции подобранные по вашим критериям:</h3>
+{% if stock_list %}
+    <ul>
+    {% for stock in stock_list %}
+        {% if stock.price < money_val and risk_min < stock.mape and stock.mape < risk_val%}
+        <li><h4>{{ stock.name }}</h4>
+            <p>стоимость сейчас: {{ stock.price }} руб.</p>
+            {% if time_invest == 3 %}
+            <p>рост за 3 месяца до: {{ stock.price_predict_3 }} руб.</p>
+            {% elif time_invest == 6 %}
+            <p>рост за 6 месяцев до: {{ stock.price_predict_6 }} руб.</p>
+            {% else %}
+            <p>рост за 12 месяцев до: {{ stock.price_predict }} руб.</p>
+            {% endif %}
+            <p>относительная ошибка прогноза: {{ stock.mape }}</p>
+        </li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+{% endblock %}
