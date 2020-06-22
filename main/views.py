@@ -148,8 +148,38 @@ def vote(request, question_id):
         answer.user = request.user
         answer.choice =  selected_choice
         answer.save()
+        setAnswers(request.user, question_id, selected_choice.id)
+        request.user.save()
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
         return HttpResponseRedirect(reverse('main:results',
                                             args=(question.id,)))
+
+
+def setAnswers(user, question_id, selected_choice):
+    if question_id == 1:
+        if selected_choice == 1:
+            answer = 'минимальный'
+        elif selected_choice == 2:
+            answer = 'средний'
+        else:
+            answer = 'высокий'
+        user.money = answer
+
+    elif question_id == 2:
+        if selected_choice == 4:
+            answer = 'минимальный'
+        elif selected_choice == 5:
+            answer = 'средний'
+        else:
+            answer = 'высокий'
+        user.risk = answer
+    else:
+        if selected_choice == 7:
+            answer = 'минимальный'
+        elif selected_choice == 8:
+            answer = 'средний'
+        else:
+            answer = 'высокий'
+        user.time_invest = answer
