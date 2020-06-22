@@ -138,14 +138,16 @@ def vote(request, question_id):
         # Redisplay the question voting form.
         return render(request, 'detail.html', {
             'question': question,
-            'error_message': "You didn't select a choice.",
+            'error_message': "Вы не выбрали ответ.",
         })
     else:
         selected_choice.votes += 1
         selected_choice.save()
-        # answer = Answer(request.user.username, question_id,
-        #                 selected_choice.title)
-        # answer.save()
+        answer = Answer()
+        answer.question = question
+        answer.user = request.user
+        answer.choice =  selected_choice
+        answer.save()
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
