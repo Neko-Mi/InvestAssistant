@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib import messages
 from django.utils.translation import ngettext
+from main.predict import Predict
+import datetime
 
 
 from .models import Question, Choice, User, Stock
@@ -24,16 +26,52 @@ admin.site.register(User)
 
 class ArticleAdmin(admin.ModelAdmin):
 
-    actions = ['make_published']
+    actions = ['calculation']
 
-    def make_published(self, request, queryset):
-        selected = queryset.update(rec_day_new='2000-01-01')
-        self.message_user(request, ngettext(
-            '%d story was successfully marked as published.',
-            '%d stories were successfully marked as published.',
-            selected,
-        ) % selected, messages.SUCCESS)
+    def calculation(self, request, queryset):
+        for item in queryset.values_list():
+            print(item)
+            predi = Predict(item[2])
 
-    make_published.short_description = "Mark selected stories as published"
+            try:
+                stock = Stock.objects.get(id=item[0])
+                stock.price = predi.getPrice()
+                print('price ok')
+                stock.price_predict, stock.mape = predi.prediction_month(12)
+                print('prediction_month(12)')
+                stock.price_predict_6, mape = predi.prediction_month(6)
+                print('prediction_month(6)')
+                stock.price_predict_3, mape = predi.prediction_month(3)
+                print('prediction_month(3)')
+
+                date_now = datetime.datetime.now().date()
+                print('date_now; ', date_now)
+                dividend_date = stock.reg_day_future - datetime.timedelta(days=2)
+                print('dividend_date; ', dividend_date)
+
+                if dividend_date > date_now:
+                    print('popal')
+                    stock.rec_day_new = predi.recommend_date(dividend_date)
+                    print('recommend_date')
+
+                print('save')
+                stock.save()
+            except:
+                pass
+
+
+
+
+
+
+        # self.message_user(request, ngettext(
+        #     '%d story was successfully marked as published.',
+        #     '%d stories were successfully marked as published.',
+        #     selected,
+        # ) % selected, messages.SUCCESS)
+
+
+
+    calculation.short_description = "рассчитать"
 
 admin.site.register(Stock, ArticleAdmin)

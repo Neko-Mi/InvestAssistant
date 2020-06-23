@@ -14,7 +14,7 @@ class Predict(object):
 
     def get_data(self):
         SBER = {"stock_name": self.name, "data":
-            pd.read_csv("./data/" + self.name + ".csv", header=0,
+            pd.read_csv("C:/Projects/diplom/InvestAssistant/main/data/" + self.name + ".csv", header=0,
                         parse_dates=True)}
 
         pred = pd.DataFrame()
@@ -30,7 +30,8 @@ class Predict(object):
         aapl = pdr.get_data_yahoo(self.name,
                                   start=datetime.datetime(2010, 1, 1),
                                   end=datetime.datetime.now())
-        aapl.to_csv('data/' + self.name + '.csv')
+        aapl.to_csv('C:/Projects/diplom/InvestAssistant/main/data/' +
+                    self.name + '.csv')
 
 
     def prediction(self, mult):
@@ -57,32 +58,35 @@ class Predict(object):
         # Predict
         forecast = m.predict(future)
 
+        new_forecast = forecast.copy()
         cmp_df = forecast.set_index('ds')[['yhat', 'yhat_lower', 'yhat_upper']] \
             .join(X.set_index('ds'))
         cmp_df['e'] = cmp_df['y'] - cmp_df['yhat']
         cmp_df['p'] = 100 * cmp_df['e'] / cmp_df['y']
-        print('MAPE', np.mean(abs(cmp_df[-train_size:]['p'])))
-        print('MAE', np.mean(abs(cmp_df[-train_size:]['e'])))
+        mape = np.mean(abs(cmp_df[-train_size:]['p']))
+        # print('MAPE', np.mean(abs(cmp_df[-train_size:]['p'])))
 
-        return forecast
+
+        return new_forecast, mape
+
 
     def prediction_month(self, mult):
-        forecast = self.prediction(mult)
-        return forecast['yhat'][-1:]
+        forecast, mape = self.prediction(mult)
+        y = round(forecast['yhat'][-1:], 2)
+        m = round(mape, 2)
+        return y, m
+
 
     def recommend_date(self, date_future):
-        date_future1 = datetime.datetime.strptime(date_future, '%Y-%m-%d')
-        date_future1 = date_future1 - datetime.timedelta(days=2)
-        date_future1 = date_future1.date()
         date_now = datetime.datetime.now().date()
-        days_to_dividend = date_future1 - date_now
+        days_to_dividend = date_future - date_now
         month = round(days_to_dividend.days / 21) + 1
 
-        forecast = self.prediction(month)
+        forecast, mape = self.prediction(month)
 
-        date_now = date_now + datetime.timedelta(days=1)
+        date_now = date_now
         date_now = datetime.datetime.strftime(date_now, '%Y-%m-%d')
-        date_future = datetime.datetime.strftime(date_future1, '%Y-%m-%d')
+        date_future = datetime.datetime.strftime(date_future, '%Y-%m-%d')
 
         ind_start = forecast.index[forecast['ds'] == date_now].to_list()[0]
         ind_end = forecast.index[forecast['ds'] == date_future].to_list()[0]
@@ -94,3 +98,6 @@ class Predict(object):
         min_date = min_date.date()
 
         return min_date
+
+    def getPrice(self):
+        return self.data['y'][-1:]
