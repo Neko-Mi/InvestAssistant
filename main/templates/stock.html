@@ -20,14 +20,14 @@
             {% elif time_invest == 6 %}
             <p>стоимость через 6 месяца: {{ stock.price_predict_6 }} руб.</p>
             {% else %}
-            <p>стоимость через 12 месяца: {{ stock.price_predict }} руб.</p>
+            <p>стоимость через 12 месяцев: {{ stock.price_predict }} руб.</p>
             {% endif %}
-            <p>относительная ошибка прогноза: {{ stock.mape }}</p>
+            <p>относительная ошибка прогноза: {{ stock.mape }} %</p>
         </li>
         {% endif %}
     {% endfor %}
     </ul>
 {% else %}
-    <p>No polls are available.</p>
+    <p>НЕТ АКЦИЙ.</p>
 {% endif %}
 {% endblock %}

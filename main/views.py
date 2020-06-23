@@ -20,28 +20,8 @@ def recommend_date(request):
     except Stock.DoesNotExist:
         raise Http404("Stock does not exist")
 
-    if money == 'минимальный':
-        money = '< 50 тыс. руб.'
-        money_val = 400
-    elif money == 'средний':
-        money = '< 500 тыс. руб.'
-        money_val = 4000
-    else:
-        money = '> 500 тыс. руб.'
-        money_val = 99999999
-
-    if risk == 'минимальный':
-        risk_min = 0.0
-        risk = 'минимальный'
-        risk_val = 6.0
-    elif risk == 'средний':
-        risk = 'средний'
-        risk_min = 6.0
-        risk_val = 12.0
-    else:
-        risk_min = 12.0
-        risk = 'высокий'
-        risk_val = 99.0
+    money, money_val = setMoney(money)
+    risk_min, risk_val = setRisk(risk)
 
     return render(request, 'recommend_date.html',
                   {'stock_list': stock_list,
@@ -73,36 +53,8 @@ def stocks(request):
     except Stock.DoesNotExist:
         raise Http404("Stock does not exist")
 
-
-    if money == 'минимальный':
-        money = '< 50 тыс. руб.'
-        money_val = 400
-    elif money == 'средний':
-        money = '< 500 тыс. руб.'
-        money_val = 4000
-    else:
-        money = '> 500 тыс. руб.'
-        money_val = 99999999
-
-    if risk == 'минимальный':
-        risk_min = 0
-        risk = 'минимальный'
-        risk_val = 6
-    elif risk == 'средний':
-        risk = 'средний'
-        risk_min = 6
-        risk_val = 12
-    else:
-        risk_min = 12
-        risk = 'высокий'
-        risk_val = 99
-
-    if time_invest == 'минимальный':
-        time_invest = 3
-    elif time_invest == 'средний':
-        time_invest = 6
-    else:
-        time_invest = 12
+    money, money_val = setMoney(money)
+    risk_min, risk_val = setRisk(risk)
 
     return render(request, 'stock.html',
                   {'stock_list': stock_list,
@@ -143,11 +95,11 @@ def vote(request, question_id):
     else:
         selected_choice.votes += 1
         selected_choice.save()
-        answer = Answer()
-        answer.question = question
-        answer.user = request.user
-        answer.choice =  selected_choice
-        answer.save()
+        # answer = Answer()
+        # answer.question = question
+        # answer.user = request.user
+        # answer.choice =  selected_choice
+        # answer.save()
         setAnswers(request.user, question_id, selected_choice.id)
         request.user.save()
         # Always return an HttpResponseRedirect after successfully dealing
@@ -156,6 +108,30 @@ def vote(request, question_id):
         return HttpResponseRedirect(reverse('main:results',
                                             args=(question.id,)))
 
+def setMoney(money):
+    if money == 'минимальный':
+        money = '< 50 тыс. руб.'
+        money_val = 400
+    elif money == 'средний':
+        money = '< 500 тыс. руб.'
+        money_val = 4000
+    else:
+        money = '> 500 тыс. руб.'
+        money_val = 99999999
+
+    return money, money_val
+
+def setRisk(risk):
+    if risk == 'минимальный':
+        risk_min = 0
+        risk_val = 6
+    elif risk == 'средний':
+        risk_min = 6
+        risk_val = 12
+    else:
+        risk_min = 12
+        risk_val = 100
+    return risk_min, risk_val
 
 def setAnswers(user, question_id, selected_choice):
     if question_id == 1:
@@ -177,9 +153,9 @@ def setAnswers(user, question_id, selected_choice):
         user.risk = answer
     else:
         if selected_choice == 7:
-            answer = 'минимальный'
+            answer = 3
         elif selected_choice == 8:
-            answer = 'средний'
+            answer = 6
         else:
-            answer = 'высокий'
+            answer = 12
         user.time_invest = answer
