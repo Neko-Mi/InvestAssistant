@@ -37,7 +37,7 @@ def user_account(request):
         request,
         'user_account.html',
         {'username': request.user.username,
-         'password': request.user.password,
+         'password': request.user.email,
          'money': request.user.money,
          'risk': request.user.risk,
          'time_invest': request.user.time_invest

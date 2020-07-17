@@ -23,7 +23,7 @@
       <ul class="sidebar-nav">
           <li><a href="{% url 'main:index' %}">Главная</a></li>
           {% if user.is_authenticated %}
-            <li><a href="{% url 'main:question' %}">Опрос</a></li>
+            <li><a href="{% url 'main:question' %}">Анкета</a></li>
             <li><a href="{% url 'main:stocks' %}">Рекомендуемые акции</a></li>
             <li><a href="{% url 'main:recommend_date' %}">Рекомендуемые дни</a></li>
             <li><a href="{% url 'main:user_account' %}">Пользователь: {{ user.get_username }}</li>

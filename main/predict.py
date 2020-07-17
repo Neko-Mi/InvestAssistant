@@ -78,7 +78,7 @@ class Predict(object):
 
 
     def recommend_date(self, date_future):
-        date_now = datetime.datetime.now().date()
+        date_now = datetime.datetime(2020, 6, 3)
         days_to_dividend = date_future - date_now
         month = round(days_to_dividend.days / 21) + 1
 
